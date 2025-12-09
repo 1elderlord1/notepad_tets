@@ -1,48 +1,75 @@
-以下是对其中主要条目的说明：
+现代记事本应用 (ModernNotePad)
 
-*.iml：忽略 Android Studio 生成的模块配置文件（.iml 格式），这类文件与本地开发环境相关，无需共享。
+项目简介
 
-.gradle：忽略 Gradle 构建工具的缓存和临时文件目录，不同环境的构建缓存可能不同。
+ModernNotePad 是一款基于 Android 平台的轻量级记事本应用，采用 Material Design 设计风格，支持笔记的创建、编辑、删除、搜索及分类管理等功能。应用采用 MVVM 架构模式，结合 Room 数据库实现本地数据持久化，确保用户笔记安全存储。
 
-/local.properties：忽略本地配置文件，通常包含 Android SDK 路径等本地环境信息，不同开发者的路径可能不同。
+核心功能
 
-/.idea/ 下的多个文件（如 caches、libraries、workspace.xml 等）：忽略 IntelliJ IDEA/Android Studio 的项目配置文件，这些文件记录本地开发环境的设置（如窗口布局、缓存等），不适合共享。
+笔记管理：支持添加、编辑、删除笔记，满足日常记录需求
 
-.DS_Store：忽略 macOS 系统自动生成的隐藏文件，用于存储文件夹的显示配置，与项目代码无关。
+分类管理：提供工作、学习、生活、其他四类笔记分类，方便整理
 
-/build、/captures：忽略构建输出目录（如编译生成的 APK、class 文件等）和调试捕获的文件（如截图、日志等），这些是构建产物，无需纳入版本控制。
+待办事项：支持将笔记标记为待办事项，并可勾选完成状态
 
-.externalNativeBuild、.cxx：忽略原生代码（C/C++）的构建相关目录，这类目录的内容由构建过程生成，无需共享。
+搜索功能：实时搜索笔记内容，快速定位所需信息
 
-通过这个配置，Git 会自动跳过这些文件，确保代码仓库中只保留核心的源代码和必要的配置，减少仓库体积并避免环境相关的冲突。这个 ipad/.gitignore 文件的作用是告诉 Git 版本控制系统哪些文件或目录不需要纳入版本管理，避免这些文件被误提交到代码仓库中。以下是对其中主要条目的说明：
+时间记录：自动记录笔记创建 / 修改时间，便于追溯
 
-*.iml：忽略 Android Studio 生成的模块配置文件（.iml 格式），这类文件与本地开发环境相关，无需共享。
+响应式 UI：适配不同屏幕尺寸，提供流畅的交互体验
 
-.gradle：忽略 Gradle 构建工具的缓存和临时文件目录，不同环境的构建缓存可能不同。
-
-/local.properties：忽略本地配置文件，通常包含 Android SDK 路径等本地环境信息，不同开发者的路径可能不同。
-
-/.idea/ 下的多个文件（如 caches、libraries、workspace.xml 等）：忽略 IntelliJ IDEA/Android Studio 的项目配置文件，这些文件记录本地开发环境的设置（如窗口布局、缓存等），不适合共享。
-
-.DS_Store：忽略 macOS 系统自动生成的隐藏文件，用于存储文件夹的显示配置，与项目代码无关。
-
-/build、/captures：忽略构建输出目录（如编译生成的 APK、class 文件等）和调试捕获的文件（如截图、日志等），这些是构建产物，无需纳入版本控制。
-
-.externalNativeBuild、.cxx：忽略原生代码（C/C++）的构建相关目录，这类目录的内容由构建过程生成，无需共享。
-
-以下为运行图片：
+界面展示
 
 主界面
 
-<img width="324" height="645" alt="image" src="https://github.com/user-attachments/assets/124ccca6-3e43-4af8-9233-b2185322350f" />
+显示所有笔记列表，支持搜索和添加新笔记
+
+<img width="324" height="645" alt="主界面" src="https://github.com/user-attachments/assets/124ccca6-3e43-4af8-9233-b2185322350f" />
 
 添加笔记界面
 
-<img width="342" height="635" alt="image" src="https://github.com/user-attachments/assets/22c02411-3091-4966-8658-405ac223bf5c" />
+可输入标题、内容，选择分类及标记为待办事项
+
+<img width="342" height="635" alt="添加笔记界面" src="https://github.com/user-attachments/assets/22c02411-3091-4966-8658-405ac223bf5c" />
 
 编辑笔记界面
 
-<img width="395" height="690" alt="image" src="https://github.com/user-attachments/assets/5932cd30-bbb3-4c97-b035-b947eab3ae1b" />
+支持修改笔记内容、分类及待办状态，提供删除功能
+
+<img width="395" height="690" alt="编辑笔记界面" src="https://github.com/user-attachments/assets/5932cd30-bbb3-4c97-b035-b947eab3ae1b" />
+技术实现
+
+架构设计
+
+采用 MVVM 架构模式，实现数据与 UI 的解耦：
+
+Model：通过 Room 数据库定义数据实体（Note）
+
+View：Activity 与 XML 布局文件负责 UI 展示
+
+ViewModel：协调数据与 UI，处理业务逻辑
+
+核心技术栈
+
+Room：本地数据库框架，负责数据持久化
+
+ViewModel & LiveData：管理 UI 相关数据，确保配置变更时数据不丢失
+
+RecyclerView：高效展示笔记列表，支持动态更新
+
+Material Design：提供统一的设计风格和交互组件
+
+Data Binding：简化 UI 与数据的绑定逻辑
+
+数据流程
+
+数据库操作通过 NoteDao 接口定义
+
+NoteRepository 作为数据访问中介，协调本地数据库操作
+
+NoteViewModel 暴露可观察数据给 UI 层
+
+UI 层（Activity）观察数据变化并更新界面
 
 以下为代码结构：
 
