@@ -70,22 +70,22 @@ Data Binding：简化 UI 与数据的绑定逻辑
 
 通过 @Entity 注解标记为 Room 数据库表，定义笔记核心属性，包含 getter/setter 及辅助方法：
 
-<img width="679" height="305" alt="image" src="https://github.com/user-attachments/assets/2fb64abf-950a-4af3-940a-97882c5ca466" />
+![构建界面](111/屏幕截图%202026-01-16%20174850.png)
 
-<img width="869" height="189" alt="image" src="https://github.com/user-attachments/assets/70ecb047-eaca-49eb-9202-eebc74baaa83" />
+![构建界面](111/屏幕截图%202026-01-16%20174931.png)
 
 
 1.2 数据库操作（NoteDao）
 
 通过 Room 注解定义数据库 CRUD 操作，返回 LiveData 实现数据变化自动通知：
 
-<img width="883" height="643" alt="image" src="https://github.com/user-attachments/assets/6ad1e5cd-c3b5-4b44-b0a9-2977e26d587f" />
+![构建界面](111/屏幕截图%202026-01-16%20175207.png)
 
 1.3 异步操作封装（NoteRepository）
 
 通过 Executors.newSingleThreadExecutor() 创建单线程池，避免主线程执行数据库操作导致 ANR：
 
-<img width="1051" height="761" alt="image" src="https://github.com/user-attachments/assets/6ab7d792-09e1-4a50-b5b3-f9d659d04033" />
+![构建界面](111/屏幕截图%202026-01-16%20173857.png)
 
 2. 笔记核心功能
 
@@ -93,7 +93,7 @@ Data Binding：简化 UI 与数据的绑定逻辑
 
 数据监听：MainActivity 观察 NoteViewModel 暴露的 getAllNotes()（LiveData 类型），数据变化时自动更新 RecyclerView 列表：
 
-<img width="944" height="180" alt="image" src="https://github.com/user-attachments/assets/e4c3fc83-5333-4ddc-ad88-efc2bd29df7c" />
+![构建界面](111/屏幕截图%202026-01-16%20174226.png)
 
 
 列表适配：NoteAdapter 封装 RecyclerView 数据绑定逻辑，支持：
@@ -122,7 +122,7 @@ Data Binding：简化 UI 与数据的绑定逻辑
 
 编辑笔记：复用原有 id，调用 noteViewModel.update() 更新数据。
 
-<img width="927" height="652" alt="image" src="https://github.com/user-attachments/assets/dcb85867-97eb-44eb-bc0d-aada121423b0" />
+![构建界面](111/屏幕截图%202026-01-16%20174410.png)
 
 2.3 笔记删除
 
@@ -138,7 +138,7 @@ Data Binding：简化 UI 与数据的绑定逻辑
 
 状态切换：NoteAdapter 中监听待办复选框状态变化，触发 onTodoChecked 回调，更新 isCompleted 并调用 noteViewModel.update(note)：
 
-<img width="879" height="186" alt="image" src="https://github.com/user-attachments/assets/323a0d44-a458-46eb-8e0d-76fec5db70ac" />
+![构建界面](111/屏幕截图%202026-01-16%20174702.png)
 
 UI 适配：根据 isTodo 显示 / 隐藏复选框，根据 isCompleted 设置复选框选中状态。
 
@@ -148,7 +148,7 @@ UI 适配：根据 isTodo 显示 / 隐藏复选框，根据 isCompleted 设置�
 
 模糊查询：每次输入变化调用 noteViewModel.searchNotes()，传入拼接通配符的搜索关键词（%query%），观察返回的 LiveData 并更新列表：
 
-<img width="934" height="455" alt="image" src="https://github.com/user-attachments/assets/d93eb1ec-359e-4764-8b7e-c44bee581a3c" />
+![构建界面](111/屏幕截图%202026-01-16%20174226.png)
 
 2.6 分类管理
 
