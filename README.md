@@ -70,13 +70,16 @@ Data Binding：简化 UI 与数据的绑定逻辑
 
 通过 @Entity 注解标记为 Room 数据库表，定义笔记核心属性，包含 getter/setter 及辅助方法：
 
-<img width="771" height="340" alt="image" src="https://github.com/user-attachments/assets/b7bcac62-69a1-491c-b8cc-a2a2138c3e4e" />
+<img width="679" height="305" alt="image" src="https://github.com/user-attachments/assets/2fb64abf-950a-4af3-940a-97882c5ca466" />
+
+<img width="869" height="189" alt="image" src="https://github.com/user-attachments/assets/70ecb047-eaca-49eb-9202-eebc74baaa83" />
+
 
 1.2 数据库操作（NoteDao）
 
 通过 Room 注解定义数据库 CRUD 操作，返回 LiveData 实现数据变化自动通知：
 
-<img width="698" height="266" alt="image" src="https://github.com/user-attachments/assets/7a0fcc26-a113-4ea0-91b1-9286d1d5a1ee" />
+<img width="883" height="643" alt="image" src="https://github.com/user-attachments/assets/6ad1e5cd-c3b5-4b44-b0a9-2977e26d587f" />
 
 1.3 异步操作封装（NoteRepository）
 
