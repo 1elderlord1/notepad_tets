@@ -37,6 +37,7 @@ ModernNotePad 是一款基于 Android 平台的轻量级记事本应用，采用
 支持修改笔记内容、分类及待办状态，提供删除功能
 
 <img width="395" height="690" alt="编辑笔记界面" src="https://github.com/user-attachments/assets/5932cd30-bbb3-4c97-b035-b947eab3ae1b" />
+
 技术实现
 
 架构设计
@@ -61,152 +62,98 @@ Material Design：提供统一的设计风格和交互组件
 
 Data Binding：简化 UI 与数据的绑定逻辑
 
-项目简介
+核心功能实现机制
 
-ModernNotePad 是一款基于 Android 平台的轻量级记事本应用，采用 MVVM 架构设计，支持笔记的增删改查、分类管理、待办事项标记、实时搜索等核心功能，通过 Room 实现本地数据持久化，保证数据不丢失。应用遵循 Material Design 设计规范，提供简洁流畅的用户体验。
+1. 数据持久化（Room 数据库）
 
-技术栈
+1.1 笔记数据模型（Note 实体）
 
-类别	技术 / 工具
-    
-开发语言        Java
+通过 @Entity 注解标记为 Room 数据库表，定义笔记核心属性，包含 getter/setter 及辅助方法：
 
-构建工具        	Gradle (Kotlin DSL)
+<img width="771" height="340" alt="image" src="https://github.com/user-attachments/assets/b7bcac62-69a1-491c-b8cc-a2a2138c3e4e" />
 
-架构模式    	    MVVM（Model-View-ViewModel）
+1.2 数据库操作（NoteDao）
 
-数据持久化	    Room Database（Android 官方推荐的本地数据库框架）
+通过 Room 注解定义数据库 CRUD 操作，返回 LiveData 实现数据变化自动通知：
 
-生命周期管理    	ViewModel + LiveData（感知生命周期，避免内存泄漏）
+<img width="698" height="266" alt="image" src="https://github.com/user-attachments/assets/7a0fcc26-a113-4ea0-91b1-9286d1d5a1ee" />
 
-UI 组件	        RecyclerView、Material Design（CardView/TextInputLayout/FAB）、Spinner 等
+1.3 异步操作封装（NoteRepository）
 
-异步处理	        ExecutorService（单线程池处理数据库异步操作）
+通过 Executors.newSingleThreadExecutor() 创建单线程池，避免主线程执行数据库操作导致 ANR：
 
-其他	        TextWatcher（实时搜索）、Intent（页面跳转）、Toast（用户提示）
+<img width="1051" height="761" alt="image" src="https://github.com/user-attachments/assets/6ab7d792-09e1-4a50-b5b3-f9d659d04033" />
 
-核心架构与实现机制
+2. 笔记核心功能
 
-1. 架构设计：MVVM
-2. 
-应用采用 MVVM 架构解耦 UI 层与数据层，各层职责清晰，便于维护和扩展：
+2.1 笔记列表展示（MainActivity + NoteAdapter）
 
-plaintext
+数据监听：MainActivity 观察 NoteViewModel 暴露的 getAllNotes()（LiveData 类型），数据变化时自动更新 RecyclerView 列表：
 
-View (Activity/Adapter) <--> ViewModel <--> Repository <--> Data Layer (Room)
-
-各层职责说明
-
-层级	                                        核心组件	                                                    职责
-
-View 层	                    MainActivity、NoteActivity、NoteAdapter	            负责 UI 展示、用户交互（点击 / 输入 / 长按等），通过观察 LiveData 响应数据变化
-
-ViewModel 层	                NoteViewModel                                  	作为 View 与 Repository 的中间层，持有 Repository 实例，暴露可观察数据，处理 UI 相关业务逻辑，不持有 UI 引用
-
-Repository 层	                NoteRepository	                                封装数据操作逻辑，统一管理数据源（本项目仅本地 Room 数据库），处理异步任务，隔离 ViewModel 与数据层
-
-Data 层	                    Note（Entity）、NoteDao、AppDatabase	                负责数据持久化，通过 Room 实现数据库的创建、增删改查
-
-4. 核心功能实现机制
-
-2.1 数据模型与持久化（Room）
-   
-（1）笔记实体定义（Note.java）
-
-通过 Room 的 @Entity 注解标记为数据库表，定义核心字段并提供 getter/setter：
-
-主键：id
-
-内容字段：title（标题）、content（内容）、timestamp（时间戳）、category（分类）
-
-扩展字段：color（背景色）、isTodo（是否为待办）、isCompleted（待办是否完成）
-
-辅助方法：getFormattedTime() 格式化时间戳为「MM-dd HH:mm」格式，用于 UI 展示
-
-（2）数据库操作（NoteDao + AppDatabase）
-
-NoteDao：数据访问接口，通过 Room 注解定义数据库操作，核心方法包括：
-
-// 查询所有笔记（返回 LiveData，自动感知数据变化）
-@Query("SELECT * FROM notes")
-LiveData<List<Note>> getAllNotes();
-
-// 模糊搜索笔记（匹配标题/内容）
-@Query("SELECT * FROM notes WHERE title LIKE :query OR content LIKE :query")
-LiveData<List<Note>> searchNotes(String query);
-
-// 增删改操作
-@Insert
-void insert(Note note);
-@Update
-void update(Note note);
-@Delete
-void delete(Note note);
-
-AppDatabase：单例模式的数据库类，继承 RoomDatabase，提供 NoteDao 实例，保证全局唯一数据库连接。
-
-（3）异步操作封装（NoteRepository）
-
-通过 ExecutorService 单线程池执行数据库操作，避免主线程阻塞：
+<img width="944" height="180" alt="image" src="https://github.com/user-attachments/assets/e4c3fc83-5333-4ddc-ad88-efc2bd29df7c" />
 
 
-public void update(Note note) {
-    executorService.execute(() -> noteDao.update(note));
-}
+列表适配：NoteAdapter 封装 RecyclerView 数据绑定逻辑，支持：
 
-2.2 笔记增删改查（CRUD）
-（1）新增 / 编辑笔记（NoteActivity）
-页面跳转：MainActivity 点击「+」按钮（FAB）跳转到 NoteActivity（新建模式）；点击笔记项传递 note_id 跳转到 NoteActivity（编辑模式）
-数据填充：编辑模式下，通过 noteViewModel.getAllNotes().observe() 监听数据，匹配 note_id 加载对应笔记内容到输入框
+展示笔记标题、内容、时间、分类；
+
+根据 isTodo 显示 / 隐藏待办复选框；
+
+根据 color 设置笔记卡片背景色；
+
+绑定点击 / 长按 / 待办状态切换事件。
+
+2.2 笔记新增 / 编辑（NoteActivity）
+
+页面模式判断：通过 Intent 是否携带 note_id 区分「新建」/「编辑」模式：
+
+新建模式：隐藏删除按钮，标题设为「新建笔记」；
+
+编辑模式：标题设为「编辑笔记」，加载对应 ID 的笔记数据填充到输入框。
+
 保存逻辑：
-校验：标题和内容不能为空
-新建：调用 noteViewModel.insert(currentNote)，设置时间戳为当前毫秒数
-编辑：调用 noteViewModel.update(currentNote)，复用原有 id 更新数据
-（2）删除笔记
-长按删除：MainActivity 中长按笔记项，触发 noteViewModel.delete(note)
-编辑页删除：NoteActivity 点击「删除」按钮，调用 noteViewModel.delete(currentNote) 并关闭页面
-（3）笔记列表展示（MainActivity + NoteAdapter）
-ViewModel 层暴露 getAllNotes()（返回 LiveData<List<Note>>），MainActivity 观察该数据：
-java
-运行
-noteViewModel.getAllNotes().observe(this, notes -> {
-    adapter.setNotes(notes); // 数据变化时更新 Adapter
-});
-NoteAdapter：RecyclerView 适配器，封装 ViewHolder 展示笔记卡片，核心逻辑：
-绑定数据：设置标题、内容、时间、分类、背景色
-待办适配：根据 isTodo 显示 / 隐藏 CheckBox，同步 isCompleted 状态
-2.3 待办事项功能
-标记待办：NoteActivity 中通过 CheckBox 设置 isTodo 字段，保存时写入数据库
-状态切换：NoteAdapter 中监听 CheckBox 状态变化，触发 onTodoChecked 回调，更新 isCompleted 并调用 noteViewModel.update(note)：
-java
-运行
-holder.checkBoxTodo.setOnCheckedChangeListener((buttonView, isChecked) -> {
-    if (listener != null) {
-        listener.onTodoChecked(currentNote, isChecked);
-    }
-});
-2.4 实时搜索功能
-输入监听：MainActivity 的搜索框添加 TextWatcher，监听文本变化
-搜索逻辑：每次文本变化调用 noteViewModel.searchNotes(s.toString())，观察返回的 LiveData 并更新列表：
-java
-运行
-searchEditText.addTextChangedListener(new TextWatcher() {
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        noteViewModel.searchNotes(s.toString()).observe(MainActivity.this, notes -> {
-            adapter.setNotes(notes); // 实时更新搜索结果
-        });
-    }
-});
-2.5 笔记分类管理
-分类选项：NoteActivity 中通过 Spinner 提供「工作 / 学习 / 生活 / 其他」4 类选项
-数据存储：保存笔记时将选中的分类写入 category 字段
-展示：NoteAdapter 中展示笔记的分类信息，便于用户快速识别
-3. UI 交互与体验优化
-Material Design 规范：使用 MaterialCardView 作为笔记卡片，TextInputLayout 优化输入体验，FAB 按钮突出「新增笔记」核心操作
-列表分割线：RecyclerView 添加 DividerItemDecoration，提升列表可读性
-页面跳转：通过 Intent 传递参数，编辑模式自动填充数据，新建模式隐藏「删除」按钮
-提示反馈：空笔记保存时通过 Toast 提示「笔记不能为空」，提升用户感知
+
+校验：标题 + 内容不能为空，为空则通过 Toast 提示；
+
+新建笔记：初始化 timestamp 为当前时间戳，调用 noteViewModel.insert()；
+
+编辑笔记：复用原有 id，调用 noteViewModel.update() 更新数据。
+
+<img width="927" height="652" alt="image" src="https://github.com/user-attachments/assets/dcb85867-97eb-44eb-bc0d-aada121423b0" />
+
+2.3 笔记删除
+
+支持两种删除方式：
+
+列表长按删除：MainActivity 中长按笔记项，触发 noteViewModel.delete(note)；
+
+编辑页删除：NoteActivity 点击删除按钮，删除当前笔记并关闭页面。
+
+2.4 待办事项功能
+
+标记待办：NoteActivity 中通过 CheckBox 设置 isTodo 字段，保存时写入数据库；
+
+状态切换：NoteAdapter 中监听待办复选框状态变化，触发 onTodoChecked 回调，更新 isCompleted 并调用 noteViewModel.update(note)：
+
+<img width="879" height="186" alt="image" src="https://github.com/user-attachments/assets/323a0d44-a458-46eb-8e0d-76fec5db70ac" />
+
+UI 适配：根据 isTodo 显示 / 隐藏复选框，根据 isCompleted 设置复选框选中状态。
+
+2.5 实时搜索功能
+
+输入监听：MainActivity 为搜索框添加 TextWatcher，监听文本变化；
+
+模糊查询：每次输入变化调用 noteViewModel.searchNotes()，传入拼接通配符的搜索关键词（%query%），观察返回的 LiveData 并更新列表：
+
+<img width="934" height="455" alt="image" src="https://github.com/user-attachments/assets/d93eb1ec-359e-4764-8b7e-c44bee581a3c" />
+
+2.6 分类管理
+
+分类选项：NoteActivity 中通过 Spinner 提供「工作 / 学习 / 生活 / 其他」4 类选项；
+
+数据存储：保存笔记时将选中的分类写入 category 字段；
+
+列表展示：NoteAdapter 中展示笔记分类，便于用户快速识别。
 
 以下为代码结构：
 
