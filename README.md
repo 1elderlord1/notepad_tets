@@ -162,79 +162,26 @@ UI 适配：根据 isTodo 显示 / 隐藏复选框，根据 isCompleted 设置�
 
 列表展示：NoteAdapter 中展示笔记分类，便于用户快速识别。
 
-以下为代码结构：
+## 项目结构
 
-notepad/
-
-└── app/
-
-    ├── build/
-    
-    │   ├── intermediates/
-    
-    │   │   ├── local_only_symbol_list/
-    
-    │   │   │   └── debug/
-    
-    │   │   │       └── parseDebugLocalResources/
-    
-    │   │   │           └── R-def.txt
-    
-    │   │   └── packaged_res/
-    
-    │   │       └── debug/
-    
-    │   │           └── packageDebugResources/
-    
-    │   │               └── color/
-    
-    │   │                   └── strings.xml
-    
-    └── src/
-    
-        └── main/
-        
-            ├── java/
-            
-            │   └── com/
-            
-            │       └── example/
-            
-            │           └── ipad/
-            
-            │               ├── Note.java
-            
-            │               ├── NoteActivity.java
-            
-            │               ├── NoteAdapter.java
-            
-            │               ├── NoteDao.java
-
-            │               ├── NoteRepository.java
-            
-            │               ├── NoteViewModel.java
-            
-            │               └── ipad/
-            
-            │                   ├── Note.java
-            
-            │                   ├── NoteActivity.java
-            
-            │                   ├── NoteAdapter.java
-            
-            │                   ├── NoteDao.java
-            
-            │                   ├── NoteRepository.java
-            
-            │                   └── NoteViewModel.java
-            
-            └── res/
-            
-                ├── color/
-                
-                │   └── strings.xml
-                
-                └── values/
-                
-                    └── strings.xml
-                    
+```
+notepad_tets/
+├── app/
+│   ├── src/main/java/com/example/ipad/
+│   │   ├── Note.java                // Room 实体类（笔记数据模型）
+│   │   ├── NoteDao.java             // Room 数据访问接口（数据库CRUD）
+│   │   ├── AppDatabase.java         // Room 数据库单例类
+│   │   ├── NoteRepository.java      // 仓库层（封装数据操作+异步）
+│   │   ├── NoteViewModel.java       // ViewModel层（连接View与Repository）
+│   │   ├── MainActivity.java        // 主页面（笔记列表+搜索+新增按钮）
+│   │   ├── NoteActivity.java        // 新增/编辑笔记页面
+│   │   ├── NoteAdapter.java         // RecyclerView适配器（笔记列表展示）
+│   ├── src/main/res/
+│   │   ├── layout/
+│   │   │   ├── activity_main.xml    // 主页面布局
+│   │   │   ├── activity_note.xml    // 新增/编辑笔记布局
+│   │   │   ├── item_note.xml        // 笔记列表项布局
+│   ├── build.gradle.kts             // 模块依赖配置
+├── build.gradle.kts                 // 项目根构建配置
+├── settings.gradle.kts              // 项目模块配置
+└── README.md                        // 项目说明
